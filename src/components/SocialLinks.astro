@@ -1,0 +1,38 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+<ul class="social" role="list">
+  {site.social.map((s) => (
+    <li>
+      <a class="social-btn" href={s.url} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} (opens in a new tab)`}>
+        <Icon name={s.name === 'LinkedIn' ? 'linkedin' : 'github'} size={20} />
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .social {
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+  }
+  .social-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    transition: color 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .social-btn:hover,
+  .social-btn:focus-visible {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  }
+</style>

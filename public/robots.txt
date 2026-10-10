@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://suchipizza.github.io/noemie/sitemap-index.xml

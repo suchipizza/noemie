@@ -1,0 +1,121 @@
+---
+import ExternalLink from './ExternalLink.astro';
+import { articles, outlets } from '../data/articles';
+
+const sorted = [...articles].sort((a, b) => b.date.localeCompare(a.date));
+const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const langName = { de: 'German', fr: 'French', en: 'English' } as const;
+---
+{sorted.length === 0 ? (
+  <p class="empty">Articles coming soon.</p>
+) : (
+  <div data-articles>
+    <div class="chips" role="group" aria-label="Filter articles by outlet" hidden data-chips>
+      <button type="button" class="chip mono" data-filter="all" aria-pressed="true">All</button>
+      {outlets.map((o) => (
+        <button type="button" class="chip mono" data-filter={o} aria-pressed="false">{o}</button>
+      ))}
+    </div>
+    <ul class="articles" role="list">
+      {sorted.map((a) => (
+        <li class="article" data-outlet={a.outlet}>
+          <ExternalLink href={a.url} class="title">{a.title}</ExternalLink>
+          <div class="meta mono">
+            <span>{a.outlet}</span>
+            <span aria-hidden="true">·</span>
+            <time datetime={a.date}>{fmt.format(new Date(a.date))}</time>
+            {a.lang && a.lang !== 'en' && (
+              <span class="lang" title={`Written in ${langName[a.lang]}`}>
+                <span aria-hidden="true">{a.lang.toUpperCase()}</span><span class="sr-only">in {langName[a.lang]}</span>
+              </span>
+            )}
+          </div>
+          {a.summary && <p class="summary">{a.summary}</p>}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-articles]').forEach((root) => {
+    const chips = root.querySelector<HTMLElement>('[data-chips]');
+    if (!chips) return;
+    chips.hidden = false;
+    const buttons = chips.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const items = root.querySelectorAll<HTMLElement>('[data-outlet]');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        items.forEach((li) => (li.hidden = f !== 'all' && li.dataset.outlet !== f));
+      }),
+    );
+  });
+</script>
+
+<style>
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .chip {
+    min-height: 36px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .chip:hover {
+    color: var(--text);
+  }
+  .chip[aria-pressed='true'] {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .articles {
+    padding: 0;
+    list-style: none;
+    max-width: var(--prose);
+  }
+  .article {
+    padding-block: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .article:first-child {
+    border-top: 1px solid var(--border);
+  }
+  .article :global(.title) {
+    font-weight: 500;
+    text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .lang {
+    padding: 0 6px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--accent-2) 40%, transparent);
+    color: var(--accent-2);
+    font-size: 0.7rem;
+  }
+  .summary {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .empty {
+    color: var(--text-muted);
+  }
+</style>

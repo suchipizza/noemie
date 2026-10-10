@@ -1,0 +1,94 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+<div class="copy-email" data-copy-email>
+  <Icon name="mail" size={20} class="mail-icon" />
+  <a href={`mailto:${site.email}`} class="email" data-email>{site.email}</a>
+  <button type="button" class="copy-btn" data-copy aria-label="Copy email address">
+    <Icon name="copy" size={16} class="i-copy" />
+    <Icon name="check" size={16} class="i-check" />
+    <span class="copy-label" aria-hidden="true">Copy</span>
+  </button>
+  <span class="sr-only" role="status" data-status></span>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-copy-email]').forEach((root) => {
+    const btn = root.querySelector<HTMLButtonElement>('[data-copy]')!;
+    const email = root.querySelector<HTMLElement>('[data-email]')!;
+    const label = root.querySelector<HTMLElement>('.copy-label')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    let timer: number | undefined;
+    btn.addEventListener('click', async () => {
+      const text = email.textContent ?? '';
+      let copied = false;
+      try {
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      } catch {
+        // Fallback: select the text so the visitor can copy it manually.
+        const range = document.createRange();
+        range.selectNodeContents(email);
+        const sel = window.getSelection();
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+        try {
+          copied = document.execCommand('copy');
+        } catch {}
+      }
+      root.classList.toggle('copied', copied);
+      label.textContent = copied ? 'Copied' : 'Selected';
+      status.textContent = copied ? 'Email address copied' : 'Email address selected, press Ctrl+C or Cmd+C to copy';
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        root.classList.remove('copied');
+        label.textContent = 'Copy';
+        status.textContent = '';
+      }, 2000);
+    });
+  });
+</script>
+
+<style>
+  .copy-email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+  }
+  .copy-email :global(.mail-icon) {
+    color: var(--accent);
+    flex: none;
+  }
+  .email {
+    font-size: 1.05rem;
+    overflow-wrap: anywhere;
+  }
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .copy-btn:hover {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  }
+  .copy-btn :global(.i-check) {
+    display: none;
+    color: var(--accent);
+  }
+  .copied .copy-btn :global(.i-check) {
+    display: block;
+  }
+  .copied .copy-btn :global(.i-copy) {
+    display: none;
+  }
+</style>

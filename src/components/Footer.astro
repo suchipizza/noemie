@@ -1,0 +1,38 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { site } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p>© {year} {site.name} · Built in {site.city}</p>
+    <div class="footer-actions">
+      <a href="#main" class="mono">Back to top ↑</a>
+      <ThemeToggle />
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding-block: 28px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+  }
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .footer-actions a {
+    font-size: 0.8rem;
+  }
+</style>

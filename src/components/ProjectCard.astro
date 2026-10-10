@@ -1,0 +1,82 @@
+---
+import Icon from './Icon.astro';
+import type { Project } from '../data/projects';
+interface Props {
+  project: Project;
+}
+const { project } = Astro.props;
+const label = new URL(project.url).host === 'github.com'
+  ? new URL(project.url).pathname.replace(/^\/|\/$/g, '')
+  : (new URL(project.url).host + new URL(project.url).pathname).replace(/\/$/, '').replace(/\/en$/, '');
+---
+<li>
+  <a class="card" href={project.url} target="_blank" rel="noopener noreferrer">
+    <div class="card-top">
+      <h3>{project.name}</h3>
+      {project.tag && <span class="tag mono">{project.tag}</span>}
+    </div>
+    <p class="desc">{project.description}</p>
+    <span class="domain mono">{label}<Icon name="external" class="ext-icon" size={12} /><span class="sr-only"> (opens in a new tab)</span></span>
+  </a>
+</li>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 20px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s var(--ease-out);
+  }
+  .card:hover,
+  .card:focus-visible {
+    color: var(--text);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    transform: translateY(-2px);
+  }
+  .card-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  h3 {
+    font-size: 1.15rem;
+  }
+  .tag {
+    flex: none;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--accent-2);
+    border: 1px solid color-mix(in srgb, var(--accent-2) 40%, transparent);
+  }
+  .desc {
+    color: var(--text-muted);
+    font-size: 0.97rem;
+    flex: 1;
+  }
+  .domain {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+  .card:hover .domain {
+    color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+    .card:hover,
+    .card:focus-visible {
+      transform: none;
+    }
+  }
+</style>

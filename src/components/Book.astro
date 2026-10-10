@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import type { Book } from '../data/books';
+interface Props {
+  book: Book;
+  index: number;
+}
+const { book, index } = Astro.props;
+const palette = ['#2F4B8A', '#8E2C48', '#3E7C6B', '#5B3A8C', '#7A4A2A', '#C9A227'];
+const color = book.spineColor ?? palette[index % palette.length];
+---
+<li class="book-item">
+  <button
+    type="button"
+    class="book"
+    style={`--book-color: ${color}`}
+    aria-label={`${book.title} by ${book.author}`}
+    aria-expanded="false"
+    aria-controls="book-detail"
+    data-book
+    data-title={book.title}
+    data-author={book.author}
+    data-note={book.note ?? ''}
+    data-url={book.url ?? ''}
+  >
+    <span class="book-3d">
+      <span class="face front">
+        {book.cover ? (
+          <Image src={book.cover} alt="" width={260} height={390} loading="lazy" class="cover-img" />
+        ) : book.isbn ? (
+          <img src={`https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`} alt="" width="130" height="195" loading="lazy" class="cover-img" />
+        ) : (
+          <span class="gen-cover" aria-hidden="true">
+            <span class="gen-rule"></span>
+            <span class="gen-title">{book.title}</span>
+            <span class="gen-author">{book.author}</span>
+          </span>
+        )}
+      </span>
+      <span class="face spine" aria-hidden="true"><span>{book.title}</span></span>
+      <span class="face pages" aria-hidden="true"></span>
+      <span class="face back" aria-hidden="true"></span>
+    </span>
+  </button>
+</li>

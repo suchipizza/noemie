@@ -1,0 +1,115 @@
+---
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/600.css';
+import '@fontsource/geist-mono/400.css';
+import '../styles/global.css';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+const { title = site.title, description = site.description, noindex = false } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(`${base}images/og.png`, Astro.site);
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: site.jobTitle,
+  url: new URL(base, Astro.site).href,
+  email: `mailto:${site.email}`,
+  address: { '@type': 'PostalAddress', addressLocality: site.city, addressCountry: site.country },
+  sameAs: site.social.map((s) => s.url),
+  knowsLanguage: site.languages,
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#121317" />
+
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="icon" href={`${base}favicon-32.png`} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <link rel="sitemap" href={`${base}sitemap-index.xml`} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+
+    <!-- Set the theme before first paint to avoid a flash. -->
+    <script is:inline>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+
+    <script>
+      // Theme toggle: persists the explicit choice; otherwise follows the system.
+      const root = document.documentElement;
+      const mq = window.matchMedia('(prefers-color-scheme: light)');
+      const stored = (): string | null => {
+        try {
+          return localStorage.getItem('theme');
+        } catch {
+          return null;
+        }
+      };
+      const sync = () => {
+        const isDark = root.getAttribute('data-theme') !== 'light';
+        document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((b) => {
+          b.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+          b.setAttribute('aria-pressed', String(!isDark));
+        });
+      };
+      const apply = (t: string) => {
+        root.setAttribute('data-theme', t);
+        sync();
+      };
+      document.querySelectorAll('[data-theme-toggle]').forEach((b) =>
+        b.addEventListener('click', () => {
+          const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          try {
+            localStorage.setItem('theme', next);
+          } catch {}
+          apply(next);
+        }),
+      );
+      mq.addEventListener('change', (e) => {
+        const s = stored();
+        if (s !== 'light' && s !== 'dark') apply(e.matches ? 'light' : 'dark');
+      });
+      sync();
+    </script>
+    {site.garyJs.enabled && site.garyJs.src && <script is:inline src={site.garyJs.src} defer></script>}
+  </body>
+</html>

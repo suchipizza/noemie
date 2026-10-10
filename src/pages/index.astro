@@ -1,0 +1,145 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ArticleList from '../components/ArticleList.astro';
+import Bookshelf from '../components/Bookshelf.astro';
+import CopyEmail from '../components/CopyEmail.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import { projects } from '../data/projects';
+import portrait from '../assets/noemie.jpg';
+---
+<Base>
+  <Nav />
+  <main id="main">
+    <section id="about" class="hero" aria-labelledby="about-title">
+      <div class="container prose">
+        <Image src={portrait} alt="Portrait of Noémie" width={112} height={112} densities={[1, 2]} loading="eager" fetchpriority="high" class="portrait" />
+        <h1 id="about-title">Hi there, I'm Noémie</h1>
+        <div class="bio">
+          <p>
+            I'm an AI-native software builder based in Zürich, Switzerland, and a senior R&amp;D engineer with a decade of
+            experience building computational models that predict how complex systems behave in the real world.
+          </p>
+          <p>
+            These days, I build agentic benchmarks and experimentation frameworks to understand how AI agents behave when
+            they're given room to explore, make decisions, fail, learn from outcomes, and try again. I also love building
+            useful applications for myself and other people.
+          </p>
+          <p>
+            I usually spend my free time exploring the Swiss Alps with my dog <ExternalLink href={site.links.noushka}>Noushka</ExternalLink>
+            and watching K-dramas. In a past life, I did computational mechanics research and a <ExternalLink href={site.links.phd}>PhD</ExternalLink>.
+          </p>
+        </div>
+        <SocialLinks />
+      </div>
+    </section>
+
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <div class="container">
+        <span class="eyebrow">01 / projects</span>
+        <h2 id="projects-title" class="section-title">Projects</h2>
+        <ul class="project-grid" role="list">
+          {projects.map((p) => <ProjectCard project={p} />)}
+        </ul>
+      </div>
+    </section>
+
+    <section id="writing" class="section" aria-labelledby="writing-title">
+      <div class="container">
+        <span class="eyebrow">02 / writing</span>
+        <h2 id="writing-title" class="section-title">Writing</h2>
+        <ArticleList />
+      </div>
+    </section>
+
+    <section id="books" class="section" aria-labelledby="books-title">
+      <div class="container">
+        <span class="eyebrow">03 / books</span>
+        <h2 id="books-title" class="section-title">Books I love</h2>
+        <Bookshelf />
+      </div>
+    </section>
+
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <div class="container prose">
+        <span class="eyebrow">04 / contact</span>
+        <h2 id="contact-title" class="section-title">Say hello</h2>
+        <CopyEmail />
+        <p class="languages">
+          I speak {site.languages.slice(0, -1).join(', ')} and {site.languages.at(-1)}.
+        </p>
+        <ul class="pills" role="list" aria-hidden="true">
+          {site.languages.map((l) => <li class="pill mono">{l}</li>)}
+        </ul>
+        <SocialLinks />
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: 72px 80px;
+    isolation: isolate;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -60px 0 0;
+    z-index: -1;
+    background: radial-gradient(ellipse 50% 60% at 30% 20%, var(--glow), transparent 70%);
+    pointer-events: none;
+  }
+  .hero :global(.portrait) {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 65% 40%;
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+    margin: 4px 0 28px 4px;
+  }
+  .hero h1 {
+    margin-bottom: 20px;
+  }
+  .bio {
+    margin-bottom: 28px;
+  }
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 640px) {
+    .project-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .languages {
+    margin-top: 24px;
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 28px;
+    padding: 0;
+    list-style: none;
+  }
+  .pill {
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+</style>

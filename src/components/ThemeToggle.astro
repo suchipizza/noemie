@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+---
+<button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme" aria-pressed="false">
+  <Icon name="sun" class="icon-sun" size={18} />
+  <Icon name="moon" class="icon-moon" size={18} />
+</button>
+
+<style>
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .theme-toggle:hover {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  }
+  .theme-toggle :global(svg) {
+    grid-area: 1 / 1;
+  }
+  /* Dark theme shows the sun (go light); light theme shows the moon (go dark). */
+  .theme-toggle :global(.icon-moon) {
+    display: none;
+  }
+  :global(:root[data-theme='light']) .theme-toggle :global(.icon-moon) {
+    display: block;
+  }
+  :global(:root[data-theme='light']) .theme-toggle :global(.icon-sun) {
+    display: none;
+  }
+</style>
