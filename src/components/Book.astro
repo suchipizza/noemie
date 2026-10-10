@@ -14,7 +14,6 @@ const color = book.spineColor ?? palette[index % palette.length];
     type="button"
     class="book"
     style={`--book-color: ${color}`}
-    aria-label={`${book.title} by ${book.author}`}
     aria-expanded="false"
     aria-controls="book-detail"
     data-book
@@ -23,7 +22,8 @@ const color = book.spineColor ?? palette[index % palette.length];
     data-note={book.note ?? ''}
     data-url={book.url ?? ''}
   >
-    <span class="book-3d">
+    <span class="sr-only">{book.title} by {book.author}</span>
+    <span class="book-3d" aria-hidden="true">
       <span class="face front">
         {book.cover ? (
           <Image src={book.cover} alt="" width={260} height={390} loading="lazy" class="cover-img" />
